@@ -106,3 +106,7 @@ end
 function flip(s::XYSpin)
     XYSpin(x.spin + π % 2π)
 end
+
+function nudge(s::XYSpin, θ::Float64)
+    XYSpin(spin(s) + θ % 2π)
+end
