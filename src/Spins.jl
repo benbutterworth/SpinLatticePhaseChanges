@@ -10,7 +10,8 @@
 #==============================================================================#
 #==============================================================================#
 
-export ISpin
+export ISpin, XYSpin, spin, flip, nudge
+
 import Base: +, -, *, /, show, convert, promote_rule
 
 #======================= ABSTRACT & CONCRETE SPIN TYPES =======================#
@@ -104,9 +105,9 @@ function flip(s::ISpin)
 end
 
 function flip(s::XYSpin)
-    XYSpin(x.spin + π % 2π)
+    XYSpin(s.spin + π % 2π)
 end
 
-function nudge(s::XYSpin, θ::Float64)
+function nudge(s::XYSpin, θ::Float16)
     XYSpin(spin(s) + θ % 2π)
 end

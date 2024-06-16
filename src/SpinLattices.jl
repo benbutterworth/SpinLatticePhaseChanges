@@ -44,6 +44,6 @@ end
 
 #================================= FLIP A SPIN ================================#
 function flip!(sg::SpinGrid, coords::Tuple{Int,Int})
-    x,y = coords...
+    x,y = coords
     sg.spins[x,y] = flip(sg.spins[x,y])
 end
