@@ -22,10 +22,12 @@ struct ISpin <: Spin
 end
 
 struct XYSpin <: Spin
-    spin::Float16
+    spin::Float64
+    function XYSpin(f::Float64)
+        s = mod(f, 2π)
+        new(s)
+    end
 end
-
-struct NullSpin <: Spin end
 
 #====================== ACCESSOR & CONSTRUCTOR FUNCTIONS ======================#
 spin(s::ISpin) = ifelse(s.spin, 1, -1)
@@ -48,8 +50,9 @@ XYSpin() = XYSpin(0.0)
 #
 
 #============================== TYPE CONVERSIONS ==============================#
-XYSpin(s::ISpin) = ifelse(s.spin, XYSpin(0), XYSpin(π))
+XYSpin(s::ISpin) = ifelse(s.spin, XYSpin(0.0), XYSpin(Float64(π)))
 function ISpin(s::XYSpin)
+    # Anything above ↔ snaps to ↑ & visa versa 
     if π / 2 < spin(s) ≤ 3π / 2
         ISpin(false)
     elseif 0 ≤ spin(s) ≤ π / 2 || 3π / 2 < spin(s) <= 2π
@@ -68,11 +71,12 @@ convert(::Type{XYSpin}, s::ISpin) = XYSpin(s)
 -(a::ISpin, b::ISpin) = spin(a) - spin(b)
 *(a::ISpin, b::ISpin) = spin(a) * spin(b)
 
-+(a::XYSpin, b::XYSpin) = spin(a) + spin(b) % 2π
--(a::XYSpin, b::XYSpin) = spin(a) - spin(b) + 2π % 2π
++(a::XYSpin, b::XYSpin) = mod(spin(a) + spin(b), 2π)
+-(a::XYSpin, b::XYSpin) = mod(spin(a) - spin(b), 2π)
 function *(a::XYSpin, b::XYSpin)
     # Dot product of 2 unit polar vectors
-    cos(spin(a)) * cos(spin(b)) + sin(spin(a)) * sin(spin(b))
+    θ, ϕ = map(spin, [a, b])
+    cos(θ) * cos(ϕ) + sin(θ) * sin(ϕ)
 end
 
 promote_rule(::Type{ISpin}, ::Type{XYSpin}) = XYSpin
@@ -105,9 +109,10 @@ function flip(s::ISpin)
 end
 
 function flip(s::XYSpin)
-    XYSpin(s.spin + π % 2π)
+    XYSpin(s.spin + π)
 end
 
-function nudge(s::XYSpin, θ::Float16)
-    XYSpin(spin(s) + θ % 2π)
+function nudge(s::XYSpin, θ::Real)
+    θ = convert(Float64, θ)
+    XYSpin(spin(s) + θ)
 end
