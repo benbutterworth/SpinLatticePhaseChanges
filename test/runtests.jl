@@ -38,7 +38,7 @@ end
 
 
 @testset "SpinLattices" begin
-    # Test SpinLattice struct
+    # Test SpinLattice structs
     sg = SpinGrid(
         (3,3),
         map(ISpin,[1 1 0; 0 0 1; 0 1 1]),
@@ -49,6 +49,9 @@ end
         map(XYSpin,[0 0.5 1; 2 3 4; 5 4 2]),
         -0.22638954227189456
     )
+    s = SpinGrid((100,100), 1.0)
+
+    @test energy(s) == 39600.0
 
     @test size(sg) == (3,3)
     @test map(spin,spins(sg)) == [1 1 -1; -1 -1 1; -1 1 1]
@@ -59,5 +62,4 @@ end
     @test energy(spins(sg)) == -12
     energy!(sg)
     @test energy(sg) == -12
-
 end
