@@ -18,7 +18,8 @@ end
 """
 struct XYSpin <: Spin
     spin::Float64
-    function XYSpin(f::Float64)
+    function XYSpin(f::Real)
+        f = convert(Float64, f)
         s = mod(f, 2π)
         new(s)
     end

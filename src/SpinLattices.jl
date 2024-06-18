@@ -22,8 +22,9 @@ Return a SpinGrid whose spins point ↑ with probability _p_.
 function SpinGrid(size::Tuple{Int,Int}, p::Float64=0.5)
     n1, n2 = size
     s = map(x -> ISpin(x, p), rand(n1, n2))
-    e = energy(s)
-    SpinGrid(size, e, s)
+    t = SpinGrid(size, s, 0)
+    e = energy(spins(t))
+    SpinGrid(size, s, e)
 end
 
 #============================= ACCESSOR FUNCTIONS =============================#
@@ -42,11 +43,11 @@ function energy!(sg::SpinGrid)
 end
 
 """
-    energy(spingrid::Matrix{ISpin})
+    energy(spingrid::Matrix{Spin})
 Return the unitless nearest neighbour energy of the Spin Matrix _s_.
 """
 function energy(spingrid::Matrix{Spin})
-    x,y = size(spingrid)
+    x, y = size(spingrid)
     g(i, j) = spingrid[i, j]
     σ = 0
     # Sum of corner elements
@@ -77,7 +78,7 @@ function energy(spingrid::Matrix{Spin})
             σ += g(i, j) * g(i - 1, j) + g(i, j) * g(i + 1, j) + g(i, j) * g(i, j - 1) + g(i, j) * g(i, j + 1)
         end
     end
-    
+
     σ
 end
 

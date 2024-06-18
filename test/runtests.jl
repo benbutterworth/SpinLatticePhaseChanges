@@ -44,8 +44,14 @@ end
         map(ISpin,[1 1 0; 0 0 1; 0 1 1]),
         -4.0
     )
+    sx = SpinGrid(
+        (3,3),
+        map(XYSpin,[0 0.5 1; 2 3 4; 5 4 2]),
+        -0.22638954227189456
+    )
 
     @test size(sg) == (3,3)
+    @test map(spin,spins(sg)) == [1 1 -1; -1 -1 1; -1 1 1]
     @test energy(spins(sg)) == energy(sg)
 
     # test that flip changes energy correctly and updates properly.
