@@ -63,3 +63,38 @@ end
     energy!(sg)
     @test energy(sg) == -12
 end
+
+@testset "Custom Slicing" begin
+    #corners
+    @test slice(temp, 1, 1) == (0, 2, 0, 2)
+    @test slice(temp, 10, 10) == (2, 0, 2, 0)
+    @test slice(temp, 1, 10) == (0, 2, 2, 0)
+    @test slice(temp, 10, 1) == (2, 0, 0, 2)
+
+    #collumns
+    @test slice(temp, 2, 1) == (1, 2, 0, 2)
+    @test slice(temp, 2, 10) == (1, 2, 2, 0)
+    @test slice(temp, 3, 1) == (2, 2, 0, 2)
+    @test slice(temp, 3, 10) == (2, 2, 2, 0)
+
+    #rows
+    @test slice(temp, 1, 2) == (0, 2, 1, 2)
+    @test slice(temp, 10, 2) == (2, 0, 1, 2)
+    @test slice(temp, 1, 3) == (0, 2, 2, 2)
+    @test slice(temp, 10, 3) == (2, 0, 2, 2)
+
+    #near edges
+    @test slice(temp, 3, 2) == (2, 2, 1, 2)
+    @test slice(temp, 2, 3) == (1, 2, 2, 2)
+    @test slice(temp, 9, 8) == (2, 1, 2, 2)
+    @test slice(temp, 8, 9) == (2, 2, 2, 1)
+
+    #inner corners
+    @test slice(temp, 2, 2) == (1, 2, 1, 2)
+    @test slice(temp, 9, 9) == (2, 1, 2, 1)
+    @test slice(temp, 2, 9) == (1, 2, 2, 1)
+    @test slice(temp, 9, 2) == (2, 1, 1, 2)
+
+    #middle
+    @test slice(temp, 3, 3) == (2, 2, 2, 2)
+end
