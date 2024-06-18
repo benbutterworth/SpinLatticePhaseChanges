@@ -109,3 +109,11 @@ function flip!(sg::SpinLattice, coords::Tuple{Int,Int})
     x, y = coords
     sg.spins[x, y] = flip(sg.spins[x, y])
 end
+
+"""
+    ΔE(sg:SpinGrid, x::Int, y::Int)
+Return the energy difference as a result of flipping the Spin at _(x,y)_.
+"""
+function ΔE(sg:SpinGrid, x::Int, y::Int)
+    0
+end
