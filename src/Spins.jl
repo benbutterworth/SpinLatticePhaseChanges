@@ -1,26 +1,21 @@
-#==============================================================================#
-#                                   SPINS.JL                                   #
-#==============================================================================#
-#  a second, more programmatic, attempt to create a spin class
-#
-#   REVISIONS:
-#     Date       Version                         Changes
-#   ========    =========  ====================================================
-#   11/06/24       0.0     
-#==============================================================================#
-#==============================================================================#
-
-export ISpin, XYSpin, spin, flip, nudge
-
-import Base: +, -, *, /, show, convert, promote_rule
+export Spin, ISpin, XYSpin
+export spin, flip, nudge
 
 #======================= ABSTRACT & CONCRETE SPIN TYPES =======================#
 abstract type Spin end
 
+"""
+    ISpin <: Spin
+1D Spin type. Can be oriented ↑ (spin=true) or ↓ (spin=false). 
+"""
 struct ISpin <: Spin
     spin::Bool #spin up or down
 end
 
+"""
+    XYSpin <: Spin
+2D Spin type. Can be oriented by any angle 0 ≤ θ ≤ 2π.
+"""
 struct XYSpin <: Spin
     spin::Float64
     function XYSpin(f::Float64)
@@ -34,6 +29,11 @@ spin(s::ISpin) = ifelse(s.spin, 1, -1)
 spin(s::XYSpin) = s.spin
 
 ISpin() = ISpin(true)
+
+"""
+    ISpin(r::AbstractFloat, p::AbstractFloat=0.5)
+Return a random spin pointing ↑ with probability _p_.
+"""
 function ISpin(r::AbstractFloat, p::AbstractFloat=0.5)
     # r = random number, p = probability threshold
     if r < p
@@ -73,6 +73,11 @@ convert(::Type{XYSpin}, s::ISpin) = XYSpin(s)
 
 +(a::XYSpin, b::XYSpin) = mod(spin(a) + spin(b), 2π)
 -(a::XYSpin, b::XYSpin) = mod(spin(a) - spin(b), 2π)
+
+"""
+    *(a::XYSpin, b::XYSpin)
+Return the magnitude of the overlap in the same direction between spins _a_ & _b_.
+"""
 function *(a::XYSpin, b::XYSpin)
     # Dot product of 2 unit polar vectors
     θ, ϕ = map(spin, [a, b])
@@ -104,14 +109,26 @@ function show(io::IO, s::XYSpin)
 end
 
 #================================= FLIP A SPIN ================================#
+"""
+    flip(s::ISpin)
+Return a spin pointing in the opposite direction to _s_.
+"""
 function flip(s::ISpin)
     ISpin(!s.spin)
 end
 
+"""
+    flip(s::XYSpin)
+Return a spin pointing in the opposite direction to _s_.
+"""
 function flip(s::XYSpin)
     XYSpin(s.spin + π)
 end
 
+"""
+    nudge(s::XYSpin, θ::Real)
+Return a spin rotated by θ rad compared to spin _s_.
+"""
 function nudge(s::XYSpin, θ::Real)
     θ = convert(Float64, θ)
     XYSpin(spin(s) + θ)

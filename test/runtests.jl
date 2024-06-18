@@ -39,4 +39,19 @@ end
 
 @testset "SpinLattices" begin
     # Test SpinLattice struct
+    sg = SpinGrid(
+        (3,3),
+        map(ISpin,[1 1 0; 0 0 1; 0 1 1]),
+        -2.0
+    )
+
+    @test size(sg) == (3,3)
+    @test energy(spins(sg)) == energy(sg)
+
+    # test that flip changes energy correctly and updates properly.
+    flip!(sg, (3,3))
+    @test energy(spins(sg)) == 0
+    energy!(sg)
+    @test energy(sg) == 0
+
 end
