@@ -1,6 +1,8 @@
 export SpinLattice, SpinGrid
 export energy, energy!, spins, flip!
 
+import Base: size, getindex, setindex!
+
 #============================= STRUCT DEFINITIONS =============================#
 abstract type SpinLattice end
 
@@ -31,6 +33,14 @@ end
 size(sg::SpinGrid) = sg.size
 spins(sg::SpinGrid) = sg.spins
 energy(sg::SpinGrid) = sg.energy
+
+function getindex(sg::SpinGrid, x::Int, y::Int)
+    spins(sg)[x,y]
+end
+
+function setindex!(sg::SpinGrid, s::Spin, x::Int, y::Int)
+    spins(sg)[x,y] = s
+end
 
 #============================ CALCULATE THE ENERGY ============================#
 """

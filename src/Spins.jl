@@ -1,6 +1,8 @@
 export Spin, ISpin, XYSpin
 export spin, flip, nudge
 
+import Base: +, -, *, /, show, convert, promote_rule
+
 #======================= ABSTRACT & CONCRETE SPIN TYPES =======================#
 abstract type Spin end
 
