@@ -42,11 +42,43 @@ function energy!(sg::SpinGrid)
 end
 
 """
-    energy(s::Matrix{ISpin})
+    energy(spingrid::Matrix{ISpin})
 Return the unitless nearest neighbour energy of the Spin Matrix _s_.
 """
-function energy(s::Matrix{Spin})
-    0
+function energy(spingrid::Matrix{Spin})
+    x,y = size(spingrid)
+    g(i, j) = spingrid[i, j]
+    σ = 0
+    # Sum of corner elements
+    σ += g(1, 1) * g(1, 2) + g(1, 1) * g(2, 1)
+    σ += g(1, y) * g(1, y - 1) + g(1, y) * g(2, y)
+    σ += g(x, 1) * g(x - 1, 1) + g(x, 1) * g(x, 2)
+    σ += g(x, y) * g(x - 1, y) + g(x, y) * g(x, y - 1)
+
+    # Sum of top & bottom rows
+    for i in 2:x-1
+        #upper row
+        σ += g(i, 1) * g(i - 1, 1) + g(i, 1) * g(i + 1, 1) + g(i, 1) * g(i, 2)
+        #lower row
+        σ += g(i, y) * g(i - 1, y) + g(i, y) * g(i + 1, y) + g(i, y) * g(i, y - 1)
+    end
+
+    # Sum of left and right collumns
+    for j in 2:y-1
+        # left collumn
+        σ += g(1, j) * g(1, j - 1) + g(1, j) * g(1, j + 1) + g(1, j) * g(2, j)
+        # right collumn
+        σ += g(x, j) * g(x, j - 1) + g(x, j) * g(x, j + 1) + g(x, j) * g(x - 1, j)
+    end
+
+    # sum of middle elements
+    for i in 2:x-1
+        for j in 2:y-1
+            σ += g(i, j) * g(i - 1, j) + g(i, j) * g(i + 1, j) + g(i, j) * g(i, j - 1) + g(i, j) * g(i, j + 1)
+        end
+    end
+    
+    σ
 end
 
 #============================= DISPLAYING SPINGRID ============================#

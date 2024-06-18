@@ -42,7 +42,7 @@ end
     sg = SpinGrid(
         (3,3),
         map(ISpin,[1 1 0; 0 0 1; 0 1 1]),
-        -2.0
+        -4.0
     )
 
     @test size(sg) == (3,3)
@@ -50,8 +50,8 @@ end
 
     # test that flip changes energy correctly and updates properly.
     flip!(sg, (3,3))
-    @test energy(spins(sg)) == 0
+    @test energy(spins(sg)) == -12
     energy!(sg)
-    @test energy(sg) == 0
+    @test energy(sg) == -12
 
 end
