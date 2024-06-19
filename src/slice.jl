@@ -10,8 +10,8 @@ function slice(t::Tuple{Int,Int}, x::Int, y::Int)
     if x ≤ 2
         xu, xd = (x - 1, 2)
     elseif mod(x + 1, nx) ≤ 1
-        δ = nx - x #always +ve ∈ [0,1,2]
-        xu, xd = (2, δ)
+        d = nx - x #always +ve ∈ [0,1,2]
+        xu, xd = (2, d)
     else
         xu, xd = (2, 2)
     end
@@ -19,8 +19,8 @@ function slice(t::Tuple{Int,Int}, x::Int, y::Int)
     if y ≤ 2
         yl, yr = (y - 1, 2)
     elseif mod(y + 1, ny) ≤ 1
-        δ = ny - y #always +ve ∈ [0,1,2]
-        yl, yr = (2, δ)
+        d = ny - y #always +ve ∈ [0,1,2]
+        yl, yr = (2, d)
     else
         yl, yr = (2, 2)
     end
@@ -54,8 +54,8 @@ Return the coordinates of the point *(x,y)* in the new custom slice of the
 object with size t.
 """
 function slicecenter(t::Tuple{Int,Int}, x::Int, y::Int)
-    ρ = [i for i ∈ slice(t, x, y)]
-    coords = (ρ[1]+1, ρ[3]+1)
+    r = [i for i ∈ slice(t, x, y)]
+    coords = (r[1]+1, r[3]+1)
     coords
 end
 
@@ -66,7 +66,7 @@ matrix *m*.
 """
 function slicecenter(m::Matrix, x::Int, y::Int)
     t = size(m)
-    ρ = [i for i ∈ slice(t, x, y)]
-    coords = (ρ[1]+1, ρ[3]+1)
+    r = [i for i ∈ slice(t, x, y)]
+    coords = (r[1]+1, r[3]+1)
     coords
 end
