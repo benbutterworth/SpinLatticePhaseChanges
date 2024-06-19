@@ -106,10 +106,9 @@ end
 
 #================================= FLIP A SPIN ================================#
 """
-    flip!(sg::SpinLattice, coords::Tuple{Int,Int})
-Alter the Spin on _sg_ at point _coords_ to point in the opposite direction.
+    flip!(sg::SpinLattice, x::Int, y::Int)
+Alter the Spin on _sg_ at point *(x,y)* to point in the opposite direction.
 """
-function flip!(sg::SpinLattice, coords::Tuple{Int,Int})
-    x, y = coords
+function flip!(sg::SpinLattice, x::Int, y::Int)
     sg.spins[x, y] = flip(sg.spins[x, y])
 end
