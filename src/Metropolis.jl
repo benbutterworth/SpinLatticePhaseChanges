@@ -18,12 +18,39 @@ function ΔE(sg::SpinGrid, x::Int, y::Int)
     E_2 - E_1
 end
 
+#==============================================================================#
+#                                NEEDS TESTING!                                #
+#==============================================================================#
 """
-    ising_energy(sg::SpinGrid)
-Return the energy of a SpinGrid _sg_ in Joules.
+    ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
+Return the energy of a spin lattice with interaction strength , *J*, between
+nearest neighbours in the prescence of the magnetic field B in polar form 
+*(|B|,θ)*.
 """
-function ising_energy(sg::SpinGrid)
-    0
+function ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
+    # J is interaction coefficient (nounits)
+        # will determine curie temp!
+    # B is magnetic field applied as polar vector B = (|B|,θ)
+    b, θ = B
+    h = XYSpin(θ)
+    # energy due to nearest neighbour interactions
+    nn = 0.5 * J * ħ^2 * energy(sg)
+    # energy due to overlap w. magnetic field
+    mg = g * μ * b * ħ *  sum(x->*(x,h), spins(sg))
+    e = nn + mg
+    e
+end
+
+"""
+    ising_energy(sg::SpinGrid, J::Real)
+Return the energy of a spin lattice with interaction strength, *J*, between 
+nearest neighbours in the absence of a magnetic field.
+"""
+function ising_energy(sg::SpinGrid, J::Real)
+    # J is interaction coefficient (nounits)
+    # energy due to nearest neighbour interactions
+    nn = 0.5 * J * ħ^2 * energy(sg)
+    nn
 end
 
 """
