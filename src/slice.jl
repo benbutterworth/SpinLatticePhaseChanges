@@ -1,3 +1,5 @@
+export slice, slicecenter
+
 """
     slice(t::Tuple{Int,Int},  x::Int, y::Int)
 Return the distances of a coordinate t from the edge of a matrix (↑, ↓, ←, →).
@@ -35,3 +37,26 @@ function slice(m::Matrix, x::Int, y::Int)
     xu, xd, yl, yr = slice(size(m), x, y)
     m[x-xu:x+xd, y-yl:y+yr]
 end
+
+"""
+    slice(sg::SpinLattice,  x::Int, y::Int)
+Return the largest possible (up to 5x5) slice of the SpinLattice _m_ branching
+out from the central point _(x,y)_.
+"""
+function slice(sg::SpinLattice, x::Int, y::Int)
+    xu, xd, yl, yr = slice(size(sg), x, y)
+    sg[x-xu:x+xd, y-yl:y+yr]
+end
+
+"""
+    slicecenter(t::Tuple{Int,Int}, oldx::Int, oldy::Int)
+Return the coordinates of the point _(oldx,oldy)_ in the new custom slice of the
+object with size t.
+"""
+function slicecenter(t::Tuple{Int,Int}, oldx::Int, oldy::Int)
+    s = slice(t, oldx, oldy)
+    ρ = [2 - i for i ∈ s]
+    x,y = (ρ[1], ρ[3])
+    oldx-x+1, oldy-y+1
+end
+###NEEDS MAJOR REVISION

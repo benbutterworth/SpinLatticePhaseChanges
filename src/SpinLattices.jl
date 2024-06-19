@@ -38,6 +38,10 @@ function getindex(sg::SpinGrid, x::Int, y::Int)
     spins(sg)[x,y]
 end
 
+function getindex(sg::SpinGrid, xr::UnitRange{Int}, yr::UnitRange{Int})
+    spins(sg)[xr,yr]
+end
+
 function setindex!(sg::SpinGrid, s::Spin, x::Int, y::Int)
     spins(sg)[x,y] = s
 end
@@ -45,7 +49,7 @@ end
 #============================ CALCULATE THE ENERGY ============================#
 """
     energy!(sg::SpinGrid)
-Update the energy of _sg_ to match the energy of its spin system _sg.spins_.
+Update the unitless energy of _sg_ to the energy of its spin system _sg.spins_.
 """
 function energy!(sg::SpinGrid)
     # Update the energy of a spingrid based on its spins
@@ -108,12 +112,4 @@ Alter the Spin on _sg_ at point _coords_ to point in the opposite direction.
 function flip!(sg::SpinLattice, coords::Tuple{Int,Int})
     x, y = coords
     sg.spins[x, y] = flip(sg.spins[x, y])
-end
-
-"""
-    ΔE(sg:SpinGrid, x::Int, y::Int)
-Return the energy difference as a result of flipping the Spin at _(x,y)_.
-"""
-function ΔE(sg:SpinGrid, x::Int, y::Int)
-    0
 end
