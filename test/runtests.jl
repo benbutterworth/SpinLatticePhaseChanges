@@ -58,7 +58,7 @@ end
     @test energy(spins(sg)) == energy(sg)
 
     # test that flip changes energy correctly and updates properly.
-    flip!(sg, (3,3))
+    flip!(sg, 3, 3)
     @test energy(spins(sg)) == -12
     energy!(sg)
     @test energy(sg) == -12
