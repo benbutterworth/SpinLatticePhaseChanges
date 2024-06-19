@@ -70,3 +70,15 @@ function slicecenter(m::Matrix, x::Int, y::Int)
     coords = (r[1]+1, r[3]+1)
     coords
 end
+
+"""
+    slicecenter(sg::SpinLattice, x::Int, y::Int)
+Return the coordinates of the point *(x,y)* in the custom slice taken of the
+matrix *m*.
+"""
+function slicecenter(sg::SpinLattice, x::Int, y::Int)
+    t = size(sg)
+    r = [i for i ∈ slice(t, x, y)]
+    coords = (r[1]+1, r[3]+1)
+    coords
+end
