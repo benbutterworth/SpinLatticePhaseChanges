@@ -66,6 +66,14 @@ end
 
 @testset "Custom Slicing" begin
     t = (10,10)
+    ch = [
+        'a' 'b' 'c' 'd' 'e'; 
+        'f' 'g' 'h' 'i' 'j'; 
+        'l' 'm' 'n' 'o' 'p'; 
+        'q' 'r' 's' 't' 'u'; 
+        'v' 'w' 'x' 'y' 'z'
+    ]
+
     #corners
     @test slice(t, 1, 1) == (0, 2, 0, 2)
     @test slice(t, 10, 10) == (2, 0, 2, 0)
@@ -98,4 +106,12 @@ end
 
     #middle
     @test slice(t, 3, 3) == (2, 2, 2, 2)
+
+    #correct central point of slice
+    for i ∈ 1:5
+        for j ∈ 1:5
+            @test slice(ch,i,j)[slicecenter(ch,i,j)...] == ch[i,j]
+        end
+    end
+
 end

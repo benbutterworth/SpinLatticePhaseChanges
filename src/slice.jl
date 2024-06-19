@@ -49,14 +49,24 @@ function slice(sg::SpinLattice, x::Int, y::Int)
 end
 
 """
-    slicecenter(t::Tuple{Int,Int}, oldx::Int, oldy::Int)
-Return the coordinates of the point _(oldx,oldy)_ in the new custom slice of the
+    slicecenter(t::Tuple{Int,Int}, x::Int, y::Int)
+Return the coordinates of the point *(x,y)* in the new custom slice of the
 object with size t.
 """
-function slicecenter(t::Tuple{Int,Int}, oldx::Int, oldy::Int)
-    s = slice(t, oldx, oldy)
-    ρ = [2 - i for i ∈ s]
-    x,y = (ρ[1], ρ[3])
-    oldx-x+1, oldy-y+1
+function slicecenter(t::Tuple{Int,Int}, x::Int, y::Int)
+    ρ = [i for i ∈ slice(t, x, y)]
+    coords = (ρ[1]+1, ρ[3]+1)
+    coords
 end
-###NEEDS MAJOR REVISION
+
+"""
+    slicecenter(m::Matrix, x::Int, y::Int)
+Return the coordinates of the point *(x,y)* in the custom slice taken of the
+matrix *m*.
+"""
+function slicecenter(m::Matrix, x::Int, y::Int)
+    t = size(m)
+    ρ = [i for i ∈ slice(t, x, y)]
+    coords = (ρ[1]+1, ρ[3]+1)
+    coords
+end
