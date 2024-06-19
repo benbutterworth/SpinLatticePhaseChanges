@@ -5,9 +5,9 @@ or Wolff algorithm and investigating its thermodynamic characteristics.
 """
 module SpinLatticePhaseChanges
 
-include("slice.jl")
-
 include("Spins.jl")
 include("SpinLattices.jl")
+include("slice.jl")
+include("Metropolis.jl")
 
 end
