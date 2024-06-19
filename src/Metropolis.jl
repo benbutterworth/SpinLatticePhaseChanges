@@ -7,12 +7,15 @@ export ising_energy, run_metropolis, ΔE
 Return the change in energy of _sg_ caused by flipping the Spin at _(x,y)_.
 """
 function ΔE(sg::SpinGrid, x::Int, y::Int)
-    coords = (0,0)
-    #find new coordinates using slice
+    #only do calculation for affected region - minimise computation
     sub = slice(sg, x,y)
     coords = slicecenter(sg, x, y)
+    # Calculate change in energy
     E_1 = energy(sub)
-    0
+    sub[coords...] = flip(sub[coords...])
+    E_2 = energy(sub)
+    sub[coords...] = flip(sub[coords...])
+    E_2 - E_1
 end
 
 """
