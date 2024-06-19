@@ -5,7 +5,7 @@ using Test
     # Write your tests here.
 end
 
-@testset "Spins" begin
+@testset "Spins.jl" begin
     # Test ISpin functionality
     s1 = ISpin()
     s2 = ISpin(false)
@@ -37,7 +37,7 @@ end
 end
 
 
-@testset "SpinLattices" begin
+@testset "SpinLattices.jl" begin
     # Test SpinLattice structs
     sg = SpinGrid(
         (3,3),
@@ -64,7 +64,7 @@ end
     @test energy(sg) == -12
 end
 
-@testset "Custom Slicing" begin
+@testset "slice.jl" begin
     t = (10,10)
     ch = [
         'a' 'b' 'c' 'd' 'e'; 
@@ -114,4 +114,23 @@ end
         end
     end
 
+end
+
+@testset "Metropolis.jl" begin
+    sg = SpinGrid(
+        (5,5),
+        map(ISpin, [1 0 0 0 1; 1 0 0 0 1; 0 1 1 1 0; 1 0 1 0 1; 1 1 0 1 0]),
+        -24
+    )
+
+    for i ∈ 1:5
+        for j ∈ 1:5
+            flip!(sg, i, j)
+            E = energy(spins(sg))
+            flip!(sg, i, j)
+            δ = E - -24
+            @test ΔE(sg, i,j) == δ
+        end
+    end
+    
 end
