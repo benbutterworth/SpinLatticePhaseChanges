@@ -1,5 +1,6 @@
 export SpinLattice, SpinGrid
 export energy, energy!, spins, flip!
+export nninteraction
 
 import Base: size, getindex, setindex!
 
@@ -96,6 +97,31 @@ function energy(spingrid::Matrix{Spin})
     σ
 end
 
+"""
+    nninteraction(spingrid::Matrix{Spin})
+Return the unitless sum of nearest neighbour interactions in a spin lattice,
+counting each pair exactly once.
+"""
+function nninteraction(spinmatrix::Matrix{Spin})
+    g(i,j) = spinmatrix[i,j]
+    I,J = size(spinmatrix)
+    Σ = 0
+    for i in 1:I-1
+        for j in 1:J-1
+            Σ += g(i,j) * g(i+1, j) + g(i,j) * g(i, j+1)
+        end
+    end
+
+    for i in 1:I-1
+        Σ += g(i,J) * g(i+1,J)
+    end
+
+    for j in 1:J-1
+        Σ += g(I,j) * g(I,j+1)
+    end
+
+    Σ
+end
 #============================= DISPLAYING SPINGRID ============================#
 function show(io::IO, sg::SpinGrid)
     n1, n2 = size(sg)
