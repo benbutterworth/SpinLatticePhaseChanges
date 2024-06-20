@@ -1,6 +1,14 @@
 # procedure for running Metropolis algorithm
-export ising_energy, run_metropolis, ΔE
+export β, ising_energy, run_metropolis, ΔE
 
+"""
+    β(T::Real)
+Return the thermodynamic beta for a temperature *T*.
+"""
+function β(T::Real)
+    T = convert(Float64, T)
+    1/(κ*T)
+end
 
 """
     ΔE(sg::SpinGrid, x::Int, y::Int)
@@ -23,9 +31,9 @@ end
 #==============================================================================#
 """
     ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
-Return the energy of a spin lattice with interaction strength , *J*, between
-nearest neighbours in the prescence of the magnetic field B in polar form 
-*(|B|,θ)*.
+Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
+between nearest neighbours in the prescence of the magnetic field B in polar 
+form *(|B|,θ)*.
 """
 function ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
     # J is interaction coefficient (nounits)
@@ -37,14 +45,13 @@ function ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
     nn = 0.5 * J * ħ^2 * energy(sg)
     # energy due to overlap w. magnetic field
     mg = g * μ * b * ħ *  sum(x->*(x,h), spins(sg))
-    e = nn + mg
-    e
+    nn + mg
 end
 
 """
     ising_energy(sg::SpinGrid, J::Real)
-Return the energy of a spin lattice with interaction strength, *J*, between 
-nearest neighbours in the absence of a magnetic field.
+Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
+between nearest neighbours in the absence of a magnetic field.
 """
 function ising_energy(sg::SpinGrid, J::Real)
     # J is interaction coefficient (nounits)
