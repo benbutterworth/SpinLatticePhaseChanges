@@ -1,5 +1,5 @@
 # procedure for running Metropolis algorithm
-export β, ising_energy, run_metropolis, ΔE
+export β, σ, ising_energy, run_metropolis, ΔE
 
 """
     β(T::Real)
@@ -8,6 +8,14 @@ Return the thermodynamic beta for a temperature *T*.
 function β(T::Real)
     T = convert(Float64, T)
     1/(κ*T)
+end
+
+"""
+    σ(n::Int)
+Return the spin of a n/2 spin particle in [J][s].
+"""
+function σ(n::Int)
+    n * ħ / 2
 end
 
 """
@@ -41,10 +49,10 @@ function ising_energy(sg::SpinGrid, J::Real, B::Tuple{Real, Real})
     # B is magnetic field applied as polar vector B = (|B|,θ)
     b, θ = B
     h = XYSpin(θ)
-    # energy due to nearest neighbour interactions
-    nn = 0.5 * J * ħ^2 * energy(sg)
+    # energy due to nearest neighbour spin interactions
+    nn = 1/2 * J * σ(1)^2 * energy(sg)
     # energy due to overlap w. magnetic field
-    mg = g * μ * b * ħ *  sum(x->*(x,h), spins(sg))
+    mg = g * μ * b * σ(1) *  sum(x->*(x,h), spins(sg))
     nn + mg
 end
 
@@ -56,7 +64,7 @@ between nearest neighbours in the absence of a magnetic field.
 function ising_energy(sg::SpinGrid, J::Real)
     # J is interaction coefficient (nounits)
     # energy due to nearest neighbour interactions
-    nn = 0.5 * J * ħ^2 * energy(sg)
+    nn = 1/2 * J * σ(1)^2 * energy(sg)
     nn
 end
 
