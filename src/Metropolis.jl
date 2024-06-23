@@ -24,8 +24,8 @@ Return the change in energy of _sg_ caused by flipping the Spin at _(x,y)_.
 """
 function ΔE(sg::SpinGrid, x::Int, y::Int)
     #only do calculation for affected region - minimise computation
-    sub = slice(sg, x,y)
-    coords = slicecenter(sg, x, y)
+    sub = segment(sg, x,y)
+    coords = segmentcenter(sg, x, y)
     # Calculate change in energy
     E_1 = energy(sub)
     sub[coords...] = flip(sub[coords...])

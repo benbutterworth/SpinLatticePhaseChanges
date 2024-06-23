@@ -36,15 +36,15 @@ spins(sg::SpinGrid) = sg.spins
 energy(sg::SpinGrid) = sg.energy
 
 function getindex(sg::SpinGrid, x::Int, y::Int)
-    spins(sg)[x,y]
+    spins(sg)[x, y]
 end
 
 function getindex(sg::SpinGrid, xr::UnitRange{Int}, yr::UnitRange{Int})
-    spins(sg)[xr,yr]
+    spins(sg)[xr, yr]
 end
 
 function setindex!(sg::SpinGrid, s::Spin, x::Int, y::Int)
-    spins(sg)[x,y] = s
+    spins(sg)[x, y] = s
 end
 
 #============================ CALCULATE THE ENERGY ============================#
@@ -103,21 +103,21 @@ Return the unitless sum of nearest neighbour interactions in a spin lattice,
 counting each pair exactly once.
 """
 function nninteraction(spinmatrix::Matrix{Spin})
-    g(i,j) = spinmatrix[i,j]
-    I,J = size(spinmatrix)
+    g(i, j) = spinmatrix[i, j]
+    I, J = size(spinmatrix)
     Σ = 0
     for i in 1:I-1
         for j in 1:J-1
-            Σ += g(i,j) * g(i+1, j) + g(i,j) * g(i, j+1)
+            Σ += g(i, j) * g(i + 1, j) + g(i, j) * g(i, j + 1)
         end
     end
 
     for i in 1:I-1
-        Σ += g(i,J) * g(i+1,J)
+        Σ += g(i, J) * g(i + 1, J)
     end
 
     for j in 1:J-1
-        Σ += g(I,j) * g(I,j+1)
+        Σ += g(I, j) * g(I, j + 1)
     end
 
     Σ

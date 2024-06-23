@@ -8,7 +8,7 @@ module SpinLatticePhaseChanges
 include("constants.jl")
 include("Spins.jl")
 include("SpinLattices.jl")
-include("slice.jl")
+include("segment.jl")
 include("Metropolis.jl")
 
 end

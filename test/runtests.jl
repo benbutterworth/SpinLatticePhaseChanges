@@ -64,7 +64,7 @@ end
     @test energy(sg) == -12
 end
 
-@testset "slice.jl" begin
+@testset "segment.jl" begin
     t = (10,10)
     ch = [
         'a' 'b' 'c' 'd' 'e'; 
@@ -73,44 +73,44 @@ end
         'q' 'r' 's' 't' 'u'; 
         'v' 'w' 'x' 'y' 'z'
     ]
-
+    
     #corners
-    @test slice(t, 1, 1) == (0, 2, 0, 2)
-    @test slice(t, 10, 10) == (2, 0, 2, 0)
-    @test slice(t, 1, 10) == (0, 2, 2, 0)
-    @test slice(t, 10, 1) == (2, 0, 0, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 1, 1) == (0, 2, 0, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 10, 10) == (2, 0, 2, 0)
+    @test SpinLatticePhaseChanges.segmentsize(t, 1, 10) == (0, 2, 2, 0)
+    @test SpinLatticePhaseChanges.segmentsize(t, 10, 1) == (2, 0, 0, 2)
 
     #collumns
-    @test slice(t, 2, 1) == (1, 2, 0, 2)
-    @test slice(t, 2, 10) == (1, 2, 2, 0)
-    @test slice(t, 3, 1) == (2, 2, 0, 2)
-    @test slice(t, 3, 10) == (2, 2, 2, 0)
+    @test SpinLatticePhaseChanges.segmentsize(t, 2, 1) == (1, 2, 0, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 2, 10) == (1, 2, 2, 0)
+    @test SpinLatticePhaseChanges.segmentsize(t, 3, 1) == (2, 2, 0, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 3, 10) == (2, 2, 2, 0)
 
     #rows
-    @test slice(t, 1, 2) == (0, 2, 1, 2)
-    @test slice(t, 10, 2) == (2, 0, 1, 2)
-    @test slice(t, 1, 3) == (0, 2, 2, 2)
-    @test slice(t, 10, 3) == (2, 0, 2, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 1, 2) == (0, 2, 1, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 10, 2) == (2, 0, 1, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 1, 3) == (0, 2, 2, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 10, 3) == (2, 0, 2, 2)
 
     #near edges
-    @test slice(t, 3, 2) == (2, 2, 1, 2)
-    @test slice(t, 2, 3) == (1, 2, 2, 2)
-    @test slice(t, 9, 8) == (2, 1, 2, 2)
-    @test slice(t, 8, 9) == (2, 2, 2, 1)
+    @test SpinLatticePhaseChanges.segmentsize(t, 3, 2) == (2, 2, 1, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 2, 3) == (1, 2, 2, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 9, 8) == (2, 1, 2, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 8, 9) == (2, 2, 2, 1)
 
     #inner corners
-    @test slice(t, 2, 2) == (1, 2, 1, 2)
-    @test slice(t, 9, 9) == (2, 1, 2, 1)
-    @test slice(t, 2, 9) == (1, 2, 2, 1)
-    @test slice(t, 9, 2) == (2, 1, 1, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 2, 2) == (1, 2, 1, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 9, 9) == (2, 1, 2, 1)
+    @test SpinLatticePhaseChanges.segmentsize(t, 2, 9) == (1, 2, 2, 1)
+    @test SpinLatticePhaseChanges.segmentsize(t, 9, 2) == (2, 1, 1, 2)
 
     #middle
-    @test slice(t, 3, 3) == (2, 2, 2, 2)
+    @test SpinLatticePhaseChanges.segmentsize(t, 3, 3) == (2, 2, 2, 2)
 
-    #correct central point of slice
+    #correct central point of segment
     for i ∈ 1:5
         for j ∈ 1:5
-            @test slice(ch,i,j)[slicecenter(ch,i,j)...] == ch[i,j]
+            @test segment(ch,i,j)[SpinLatticePhaseChanges.segmentcenter(ch,i,j)...] == ch[i,j]
         end
     end
 
