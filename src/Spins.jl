@@ -47,10 +47,7 @@ function ISpin(r::AbstractFloat, p::AbstractFloat=0.5)
 end
 
 XYSpin() = XYSpin(0.0)
-#
-#  CONCEPTUAL ISSUE - HOW CAN YOU CREATE A RANDOM UNIT POLAR VECTOR WITH IT'S
-#	DIRECTION WEIGHTED TOWARDS A CERTAIN POLAR UNIT VECTOR, ̄r?
-#
+# ISSUE - how to create random polar vector
 
 #============================== TYPE CONVERSIONS ==============================#
 XYSpin(s::ISpin) = ifelse(s.spin, XYSpin(0.0), XYSpin(Float64(π)))
