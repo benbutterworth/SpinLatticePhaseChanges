@@ -1,140 +1,97 @@
-export SpinLattice, SpinGrid
-export energy, energy!, spins, flip!
-export nninteraction
+export SpinLattice, SpinGrid, XYSpinGrid, spins, flip!
+import Base: show, getindex, setindex!, size
 
-import Base: size, getindex, setindex!
+#========================== LOGIC FOR ERROR CHECKING ==========================#
+function is2D(M::Matrix)
+    if length(size(M)) == 2
+        true
+    else
+        false
+    end
+end #all matrices are 2d, redundant!
 
-#============================= STRUCT DEFINITIONS =============================#
+function atLeast5x5(M::Matrix)
+    if size(M) ≥ (5, 5)
+        true
+    else
+        false
+    end
+end
+
+#========================= ABSTRACT TYPE & STRUCT DEF =========================#
 abstract type SpinLattice end
 
 """
     SpinGrid <: SpinLattice
-A type for a 2D grid of Spins with an associated energy.
+Type representing a 2 dimensional lattice of spins.
 """
 mutable struct SpinGrid <: SpinLattice
-    # 2 dimensional Spin lattice containing only ↑ & ↓ spins
-    size::Tuple{Int,Int}
     spins::Matrix{Spin}
-    energy::Float64
-end
 
-"""
-    SpinGrid(size::Tuple{Int,Int}, p::Float64=0.5)
-Return a SpinGrid whose spins point ↑ with probability _p_.
-"""
-function SpinGrid(size::Tuple{Int,Int}, p::Float64=0.5)
-    n1, n2 = size
-    s = map(x -> ISpin(x, p), rand(n1, n2))
-    t = SpinGrid(size, s, 0)
-    e = energy(spins(t))
-    SpinGrid(size, s, e)
-end
-
-#============================= ACCESSOR FUNCTIONS =============================#
-size(sg::SpinGrid) = sg.size
-spins(sg::SpinGrid) = sg.spins
-energy(sg::SpinGrid) = sg.energy
-
-function getindex(sg::SpinGrid, x::Int, y::Int)
-    spins(sg)[x, y]
-end
-
-function getindex(sg::SpinGrid, xr::UnitRange{Int}, yr::UnitRange{Int})
-    spins(sg)[xr, yr]
-end
-
-function setindex!(sg::SpinGrid, s::Spin, x::Int, y::Int)
-    spins(sg)[x, y] = s
-end
-
-#============================ CALCULATE THE ENERGY ============================#
-"""
-    energy!(sg::SpinGrid)
-Update the unitless energy of _sg_ to the energy of its spin system _sg.spins_.
-"""
-function energy!(sg::SpinGrid)
-    # Update the energy of a spingrid based on its spins
-    sg.energy = energy(spins(sg))
-end
-
-"""
-    energy(spingrid::Matrix{Spin})
-Return the unitless nearest neighbour energy of the Spin Matrix _s_.
-"""
-function energy(spingrid::Matrix{Spin})
-    x, y = size(spingrid)
-    g(i, j) = spingrid[i, j]
-    σ = 0
-    # Sum of corner elements
-    σ += g(1, 1) * g(1, 2) + g(1, 1) * g(2, 1)
-    σ += g(1, y) * g(1, y - 1) + g(1, y) * g(2, y)
-    σ += g(x, 1) * g(x - 1, 1) + g(x, 1) * g(x, 2)
-    σ += g(x, y) * g(x - 1, y) + g(x, y) * g(x, y - 1)
-
-    # Sum of top & bottom rows
-    for i in 2:x-1
-        #upper row
-        σ += g(i, 1) * g(i - 1, 1) + g(i, 1) * g(i + 1, 1) + g(i, 1) * g(i, 2)
-        #lower row
-        σ += g(i, y) * g(i - 1, y) + g(i, y) * g(i + 1, y) + g(i, y) * g(i, y - 1)
-    end
-
-    # Sum of left and right collumns
-    for j in 2:y-1
-        # left collumn
-        σ += g(1, j) * g(1, j - 1) + g(1, j) * g(1, j + 1) + g(1, j) * g(2, j)
-        # right collumn
-        σ += g(x, j) * g(x, j - 1) + g(x, j) * g(x, j + 1) + g(x, j) * g(x - 1, j)
-    end
-
-    # sum of middle elements
-    for i in 2:x-1
-        for j in 2:y-1
-            σ += g(i, j) * g(i - 1, j) + g(i, j) * g(i + 1, j) + g(i, j) * g(i, j - 1) + g(i, j) * g(i, j + 1)
+    function SpinGrid(spingrid::Matrix{T})  where T<:Spin
+        if !is2D(spingrid)
+            @error "spingrid is not 2D"
         end
-    end
-
-    σ
-end
-
-"""
-    nninteraction(spingrid::Matrix{Spin})
-Return the unitless sum of nearest neighbour interactions in a spin lattice,
-counting each pair exactly once.
-"""
-function nninteraction(spinmatrix::Matrix{Spin})
-    g(i, j) = spinmatrix[i, j]
-    I, J = size(spinmatrix)
-    Σ = 0
-    for i in 1:I-1
-        for j in 1:J-1
-            Σ += g(i, j) * g(i + 1, j) + g(i, j) * g(i, j + 1)
+        if !atLeast5x5(spingrid)
+            @warn "spingrid is small - size < (5,5). Take care when using segment."
         end
+        new(spingrid)
     end
 
-    for i in 1:I-1
-        Σ += g(i, J) * g(i + 1, J)
-    end
-
-    for j in 1:J-1
-        Σ += g(I, j) * g(I, j + 1)
-    end
-
-    Σ
-end
-#============================= DISPLAYING SPINGRID ============================#
-function show(io::IO, sg::SpinGrid)
-    n1, n2 = size(sg)
-    println("$n1 x $n2 SpinGrid")
-    println(io, spins(sg))
-    println(io, "Energy : ", energy(sg))
 end
 
-#================================= FLIP A SPIN ================================#
+#================================ CONSTRUCTORS ================================#
 """
-    flip!(sg::SpinLattice, x::Int, y::Int)
-Alter the Spin on _sg_ at point *(x,y)* to point in the opposite direction.
+    SpinGrid(nrows::Int, ncols::Int, probSpinUp::Float64=0.5)
+Return a SpinGrid of 1 dimensional spins of size *(nrows, ncols)* pointing in
+the ̂x direction with probability *probSpinUp*.
 """
-function flip!(sg::SpinLattice, x::Int, y::Int)
-    sg.spins[x, y] = flip(sg.spins[x, y])
+function SpinGrid(nrows::Int, ncols::Int, probSpinUp::Float64=0.5)
+    map(
+        x -> ISpin(x, probSpinUp),
+        rand(nrows, ncols)
+    ) |> SpinGrid
+end
+
+"""
+    XYSpinGrid(nrows::Int, ncols::Int)
+Return a SpinGrid of 2 dimensional spins of size *(nrows, ncols)* oriented in
+a random direction in the XY plane.
+"""
+function XYSpinGrid(nrows::Int, ncols::Int)
+    map(
+        XYSpin,
+        rand(nrows, ncols) .* 2π
+    ) |> SpinGrid
+end
+
+#================================== ACCESSORS =================================#
+spins(spingrid::SpinGrid) = spingrid.spins
+size(spingrid::SpinGrid) = size(spins(spingrid))
+
+#========================= INDEXING AND SETTING RULES =========================#
+function getindex(spingrid::SpinGrid, x::Int, y::Int)
+    spins(spingrid)[x, y]
+end
+
+function getindex(spingrid::SpinGrid, xr::UnitRange{Int}, yr::UnitRange{Int})
+    spins(spingrid)[xr, yr]
+end
+
+function setindex!(spingrid::SpinGrid, s::Spin, x::Int, y::Int)
+    spins(spingrid)[x, y] = s
+end
+
+#============================== SHOWING SPINGRIDS =============================#
+function show(io::IO, spingrid::SpinGrid)
+    show(io, spins(spingrid))
+end
+
+#================================ SPIN FLIPPING ===============================#
+"""
+    flip!(spingrid::SpinGrid, x::Int, y::Int)
+Flip the Spin on *spingrid* at point *(x,y)* to point in the opposite direction.
+"""
+function flip!(spingrid::SpinGrid, x::Int, y::Int)
+    spingrid.spins[x, y] = flip(spingrid.spins[x, y])
 end
