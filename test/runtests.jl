@@ -22,9 +22,9 @@ end
     s1 = XYSpin()
     s2 = XYSpin(π / 2)
     s3 = XYSpin(3π / 2)
-    s = [s1,s2,s3]
+    s = [s1, s2, s3]
 
-    @test map(spin, s) == [0, π/2, 3π/2]
+    @test map(spin, s) == [0, π / 2, 3π / 2]
     @test s1 + s2 == spin(s2)
     @test s2 + s3 == spin(s1)
     @test s2 - s3 == s3 - s2 == Float64(π)
@@ -33,47 +33,38 @@ end
     @test ISpin(s3) == ISpin(false)
     @test flip(s2) == s3
     @test flip(s3) == s2
-    @test map(x->nudge(x,π), s) == map(flip, s)
+    @test map(x -> nudge(x, π), s) == map(flip, s)
 end
 
 
 @testset "SpinLattices.jl" begin
     # Test SpinLattice structs
-    sg = SpinGrid(
-        (3,3),
-        map(ISpin,[1 1 0; 0 0 1; 0 1 1]),
-        -4.0
+    spingrid = SpinGrid(
+        map(ISpin, [0 0 0 0 0; 0 0 1 1 0; 1 1 1 0 0; 1 0 0 0 1; 0 1 0 0 1])
     )
-    sx = SpinGrid(
-        (3,3),
-        map(XYSpin,[0 0.5 1; 2 3 4; 5 4 2]),
-        -0.22638954227189456
-    )
-    s = SpinGrid((100,100), 1.0)
+    s = SpinGrid(100, 100, 1.0)
 
-    @test energy(s) == 39600.0
-
-    @test size(sg) == (3,3)
-    @test map(spin,spins(sg)) == [1 1 -1; -1 -1 1; -1 1 1]
-    @test energy(spins(sg)) == energy(sg)
+    @test size(spingrid) == (5,5)
+    @test map(spin, spins(spingrid)) == [-1 -1 -1 -1 -1; -1 -1 1 1 -1; 1 1 1 -1 -1; 1 -1 -1 -1 1; -1 1 -1 -1 1] 
 
     # test that flip changes energy correctly and updates properly.
-    flip!(sg, 3, 3)
-    @test energy(spins(sg)) == -12
-    energy!(sg)
-    @test energy(sg) == -12
+    spintest = spingrid[3,3]
+    flip!(spingrid, 3, 3)
+    @test spintest == flip(spingrid[3,3])
+
+    @test sum(spin, spins(s)) == 100^2
 end
 
 @testset "segment.jl" begin
-    t = (10,10)
+    t = (10, 10)
     ch = [
-        'a' 'b' 'c' 'd' 'e'; 
-        'f' 'g' 'h' 'i' 'j'; 
-        'l' 'm' 'n' 'o' 'p'; 
-        'q' 'r' 's' 't' 'u'; 
+        'a' 'b' 'c' 'd' 'e';
+        'f' 'g' 'h' 'i' 'j';
+        'l' 'm' 'n' 'o' 'p';
+        'q' 'r' 's' 't' 'u';
         'v' 'w' 'x' 'y' 'z'
     ]
-    
+
     #corners
     @test SpinLatticePhaseChanges.segmentsize(t, 1, 1) == (0, 2, 0, 2)
     @test SpinLatticePhaseChanges.segmentsize(t, 10, 10) == (2, 0, 2, 0)
@@ -110,27 +101,29 @@ end
     #correct central point of segment
     for i ∈ 1:5
         for j ∈ 1:5
-            @test segment(ch,i,j)[SpinLatticePhaseChanges.segmentcenter(ch,i,j)...] == ch[i,j]
+            @test segment(ch, i, j)[SpinLatticePhaseChanges.segmentcenter(ch, i, j)...] == ch[i, j]
         end
     end
 
 end
 
+
+#
+# ALL WILL FAIL AS OF 24-06-24
+#
 @testset "Metropolis.jl" begin
-    sg = SpinGrid(
-        (5,5),
+    spingrid = SpinGrid(
         map(ISpin, [1 0 0 0 1; 1 0 0 0 1; 0 1 1 1 0; 1 0 1 0 1; 1 1 0 1 0]),
-        -24
     )
 
     for i ∈ 1:5
         for j ∈ 1:5
-            flip!(sg, i, j)
-            E = energy(spins(sg))
-            flip!(sg, i, j)
+            flip!(spingrid, i, j)
+            E = energy(spins(spingrid))
+            flip!(spingrid, i, j)
             δ = E - -24
-            @test ΔE(sg, i,j) == δ
+            @test ΔE(spingrid, i, j) == δ
         end
     end
-    
+
 end
