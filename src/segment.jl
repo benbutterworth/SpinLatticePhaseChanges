@@ -29,8 +29,6 @@ Return the largest possible (up to 5x5) segment of the matrix _m_ branching out
 from the central point _(x,y)_.
 """
 function segment(m::Matrix, x::Int, y::Int)
-    # xu, xd, yl, yr = segmentsize(size(m), x, y)
-    # m[x-xu:x+xd, y-yl:y+yr]
     if size(m) < (5,5)
         @error "Too small to segment"
     end
@@ -40,14 +38,12 @@ function segment(m::Matrix, x::Int, y::Int)
 end
 
 """
-    segment(sg::SpinLattice, x::Int, y::Int)
-Return the largest possible (up to 5x5) segment of the SpinLattice _m_ branching
-out from the central point _(x,y)_.
+    segment(spingrid::SpinLattice, x::Int, y::Int)
+Return a subset of the SpinLattice *spingrid* containing all the points on the
+lattice that would be affected by flipping the spin *(x,y)*.
 """
 function segment(sg::SpinLattice, x::Int, y::Int)
-    # xu, xd, yl, yr = segmentsize(size(sg), x, y)
-    # sg[x-xu:x+xd, y-yl:y+yr]
-    segment(spins(sg), x, y)
+    segment(spins(sg), x, y) |> SpinGrid
 end
 
 """
@@ -58,10 +54,6 @@ object with size t.
 function segmentcenter(t::Tuple{Int,Int}, x::Int, y::Int)
     fromLUcorner = segmentsize(t, x, y) .+ 1
     fromLUcorner[1], fromLUcorner[3]
-
-    # r = [i for i ∈ segmentsize(t, x, y)]
-    # coords = (r[1] + 1, r[3] + 1)
-    # coords
 end
 
 """
