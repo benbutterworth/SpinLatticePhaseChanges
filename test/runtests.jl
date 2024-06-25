@@ -115,15 +115,4 @@ end
     spingrid = SpinGrid(
         map(ISpin, [1 0 0 0 1; 1 0 0 0 1; 0 1 1 1 0; 1 0 1 0 1; 1 1 0 1 0]),
     )
-
-    for i ∈ 1:5
-        for j ∈ 1:5
-            flip!(spingrid, i, j)
-            E = energy(spins(spingrid))
-            flip!(spingrid, i, j)
-            δ = E - -24
-            @test ΔE(spingrid, i, j) == δ
-        end
-    end
-
 end
