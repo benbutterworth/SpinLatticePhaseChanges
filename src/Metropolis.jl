@@ -9,7 +9,7 @@ Return the thermodynamic beta for a temperature *T*.
 """
 function β(T::Real)
     T = convert(Float64, T)
-    1/(κ*T)
+    1 / (κ * T)
 end
 
 """
@@ -21,79 +21,71 @@ function σ(n::Int)
 end
 
 #=========================== CONTRIBUTIONS TO ENERGY ==========================#
+function rowpairproduct(mat::Matrix, row::Int, col::Int)
+    mat[row, col] * mat[row+1, col]
+end
+
+function colpairproduct(mat::Matrix, row::Int, col::Int)
+    mat[row, col] * mat[row, col+1]
+end
+
 """
-    neighbourinteraction(spingrid::Matrix{Spin})
+    neighbourinteraction(spingrid::SpinGrid)
 Return the contribution to the energy of nearest neighbour interactions in a
 spin lattice, counting each pair exactly once.
 """
-function neighbourinteraction(spinmatrix::Matrix{Spin})
+function neighbourinteraction(spingrid::SpinGrid, J::Real)
+    spinmatrix = spins(spingrid)
     endrow, endcol = size(spinmatrix)
     Σ = 0
+
     for row in 1:endrow-1
         for col in 1:endcol-1
-            Σ += spinmatrix[row, col] * spinmatrix[row + 1, col] + spinmatrix[row, col] * spinmatrix[row, col + 1]
+            Σ += rowpairproduct(spinmatrix, row, col) + colpairproduct(spinmatrix, row, col)
         end
     end
 
     for row in 1:endrow-1
-        Σ += spinmatrix[row, endcol] * spinmatrix[row + 1, endcol]
+        Σ += rowpairproduct(spinmatrix, row, endcol)
     end
 
     for col in 1:endcol-1
-        Σ += spinmatrix[endrow, col] * spinmatrix[endrow, col + 1]
+        Σ += colpairproduct(spinmatrix, endrow, col)
     end
 
-    Σ
+    # -J * Σ * (ħ^2 / 4) # true Return
+    Σ # dummy return for testing
 end
 
 """
-    magneticinteraction(spinmatrix::Matrix{Spin}, B::Tuple{Real, Real})
-Return the unitles energy contribution from a lattice of spins interacting 
-with an external magnetic field B = (|B|, θ)
+    magneticinteraction(spingrid::SpinGrid, H::Tuple{Real, Real})
+Return the unitless energy contribution from a lattice of spins interacting 
+with an external applied magnetic field H = (|H|, θ)
 """
-function magneticinteraction(spinmatrix::Matrix{Spin}, B::Tuple{Real, Real})
-    0
+function magneticinteraction(spingrid::SpinGrid, H::Tuple{Real,Real})
+    spinmatrix = spins(spingrid)
+    appliedFieldStrength = H[1]
+    appliedFieldAsSpin = XYSpin(H[2])
+
+    magMoment = sum(
+        s -> s * appliedFieldAsSpin,
+        spinmatrix
+    )
+
+    # magMoment * -g * μ * appliedFieldStrength # true return
+    magMoment * appliedFieldStrength # dummy return for testing
 end
 
-#
-# WILL NO LONGER WORK 24/06/2024 - MUST BE REWRITTEN
-#
-"""
-    ΔE(spingrid::SpinGrid, x::Int, y::Int)
-Return the change in energy of _spingrid_ caused by flipping the Spin at _(x,y)_.
-"""
-function ΔE(spingrid::SpinGrid, x::Int, y::Int)
-    #only do calculation for affected region - minimise computation
-    sub = segment(spingrid, x,y)
-    coords = segmentcenter(spingrid, x, y)
-    # Calculate change in energy
-    E_1 = energy(sub)
-    sub[coords...] = flip(sub[coords...])
-    E_2 = energy(sub)
-    sub[coords...] = flip(sub[coords...])
-    E_2 - E_1
-end
-
-#==============================================================================#
-#                                NEEDS TESTING!                                #
-#==============================================================================#
+#===================== TOTAL ENERGY AND CHANGES IN ENERGY =====================#
 """
     ising_energy(spingrid::SpinGrid, J::Real, B::Tuple{Real, Real})
 Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
 between nearest neighbours in the prescence of the magnetic field B in polar 
 form *(|B|,θ)*.
 """
-function ising_energy(spingrid::SpinGrid, J::Real, B::Tuple{Real, Real})
-    # J is interaction coefficient (nounits)
-        # will determine curie temp!
-    # B is magnetic field applied as polar vector B = (|B|,θ)
-    b, θ = B
-    h = XYSpin(θ)
-    # energy due to nearest neighbour spin interactions
-    nn = 1/2 * J * σ(1)^2 * energy(spingrid)
-    # energy due to overlap w. magnetic field
-    mg = g * μ * b * σ(1) *  sum(x->*(x,h), spins(spingrid))
-    nn + mg
+function ising_energy(spingrid::SpinGrid, J::Real, H::Tuple{Real,Real})
+    # nearest neighbour and magnetif moment energy summation
+    0
 end
 
 """
@@ -102,12 +94,20 @@ Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
 between nearest neighbours in the absence of a magnetic field.
 """
 function ising_energy(spingrid::SpinGrid, J::Real)
-    # J is interaction coefficient (nounits)
-    # energy due to nearest neighbour interactions
-    nn = 1/2 * J * σ(1)^2 * energy(spingrid)
-    nn
+    # NO APPLIED FIELD CASE
+    0
 end
 
+"""
+    ΔE(spingrid::SpinGrid, x::Int, y::Int)
+Return the change in energy of _spingrid_ caused by flipping the Spin at _(x,y)_.
+"""
+function ΔE(spingrid::SpinGrid, x::Int, y::Int)
+    # segment then calculate energy before & after flipping. INCLUDE H.
+    0
+end
+
+#======================= EXECUTE SPINFLIPPING ALGORITHM =======================#
 """
     run_metropolis(spingrid::SpinGrid, n::Int)
 Execute the metropolis spin-flipping algorithm _n_ times on the SpinGrid _spingrid_.
