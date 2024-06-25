@@ -95,3 +95,14 @@ Flip the Spin on *spingrid* at point *(x,y)* to point in the opposite direction.
 function flip!(spingrid::SpinGrid, x::Int, y::Int)
     spingrid.spins[x, y] = flip(spingrid.spins[x, y])
 end
+
+"""
+    flip(spingrid::SpinGrid, x::Int, y::Int)
+Return a SpinGrid identical to *spingrid* but with the Spin on *spingrid* at 
+point *(x,y)*  flipped in the opposite direction.
+"""
+function flip(spingrid::SpinGrid, x::Int, y::Int)
+    spinmat = copy(spins(spingrid))
+    spinmat[x,y] = flip(spinmat[x,y])
+    SpinGrid(spinmat)
+end
