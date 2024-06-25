@@ -78,14 +78,14 @@ end
 
 #===================== TOTAL ENERGY AND CHANGES IN ENERGY =====================#
 """
-    ising_energy(spingrid::SpinGrid, J::Real, B::Tuple{Real, Real})
+    ising_energy(spingrid::SpinGrid, J::Real, BH::Tuple{Real, Real})
 Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
-between nearest neighbours in the prescence of the magnetic field B in polar 
-form *(|B|,θ)*.
+between nearest neighbours in the prescence of an applied magnetic field H in 
+polar form *(|B|,θ)*.
 """
 function ising_energy(spingrid::SpinGrid, J::Real, H::Tuple{Real,Real})
     # nearest neighbour and magnetif moment energy summation
-    0
+    neighbourinteraction(spingrid, J) + magneticinteraction(spingrid, H)
 end
 
 """
@@ -95,17 +95,20 @@ between nearest neighbours in the absence of a magnetic field.
 """
 function ising_energy(spingrid::SpinGrid, J::Real)
     # NO APPLIED FIELD CASE
-    0
+    neighbourinteraction(spingrid, J)
 end
 
 """
-    ΔE(spingrid::SpinGrid, x::Int, y::Int)
+    ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
 Return the change in energy of _spingrid_ caused by flipping the Spin at _(x,y)_.
 """
-function ΔE(spingrid::SpinGrid, x::Int, y::Int)
+function ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
     # segment then calculate energy before & after flipping. INCLUDE H.
-    0
+    energyBeforeFlip = ising_energy(spingrid, J, H)
+    energyAfterFlip = ising_energy(flip(spingrid, x, y), J, H)
+    energyAfterFlip - energyBeforeFlip
 end
+
 
 #======================= EXECUTE SPINFLIPPING ALGORITHM =======================#
 """
