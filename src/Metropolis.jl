@@ -53,8 +53,7 @@ function neighbourinteraction(spingrid::SpinGrid, J::Real)
         Σ += colpairproduct(spinmatrix, endrow, col)
     end
 
-    # -J * Σ * (ħ^2 / 4) # true Return
-    Σ # dummy return for testing
+    -J * Σ * (ħ^2 / 4)
 end
 
 """
@@ -72,35 +71,32 @@ function magneticinteraction(spingrid::SpinGrid, H::Tuple{Real,Real})
         spinmatrix
     )
 
-    # magMoment * -g * μ * appliedFieldStrength # true return
-    magMoment * appliedFieldStrength # dummy return for testing
+    -g * μ * (ħ/2) * magMoment * appliedFieldStrength 
 end
 
 #===================== TOTAL ENERGY AND CHANGES IN ENERGY =====================#
+
 """
-    ising_energy(spingrid::SpinGrid, J::Real, BH::Tuple{Real, Real})
-Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
-between nearest neighbours in the prescence of an applied magnetic field H in 
-polar form *(|B|,θ)*.
+    ising_energy(spingrid::SpinGrid, J::Real, H=(0., 0.))
+Return the energy (in Joules) of a spin lattice `spingrid` with interaction 
+strength , `J`, between nearest neighbours in the prescence of an applied 
+magnetic field `H` in polar form (|H|,θ).
 """
+function ising_energy end
+
 function ising_energy(spingrid::SpinGrid, J::Real, H::Tuple{Real,Real})
     # nearest neighbour and magnetif moment energy summation
     neighbourinteraction(spingrid, J) + magneticinteraction(spingrid, H)
 end
 
-"""
-    ising_energy(spingrid::SpinGrid, J::Real)
-Return the energy (in Joules) of a spin lattice with interaction strength , *J*,
-between nearest neighbours in the absence of a magnetic field.
-"""
 function ising_energy(spingrid::SpinGrid, J::Real)
     # NO APPLIED FIELD CASE
     neighbourinteraction(spingrid, J)
 end
 
 """
-    ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
-Return the change in energy of _spingrid_ caused by flipping the Spin at _(x,y)_.
+    ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H=(0, 0))
+Return the change in energy of `spingrid` caused by flipping Spin _(x,y)_.
 """
 function ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
     # segment then calculate energy before & after flipping. INCLUDE H.
@@ -112,9 +108,22 @@ end
 
 #======================= EXECUTE SPINFLIPPING ALGORITHM =======================#
 """
-    run_metropolis(spingrid::SpinGrid, n::Int)
-Execute the metropolis spin-flipping algorithm _n_ times on the SpinGrid _spingrid_.
+    run_metropolis(spingrid::SpinGrid, temperature::Real nFlips::Int)
+Execute the metropolis spin-flipping algorithm `nFlips` times `spingrid`.
 """
-function run_metropolis(spingrid::SpinGrid, n::Int)
-    0
+function run_metropolis(spingrid::SpinGrid, temperature::Real, nFlips::Int)
+    J = 7/2
+    H = (0,0)
+    nrows, ncols = size(spingrid)
+    let spingrid = spingrid # change local not global variable? #memory issues?
+        for i in 1:nFlips
+            randrow = rand(1:nrows); randcol = rand(1:ncols)
+            r = rand()
+            threshold = exp(-β(temperature) * ΔE(spingrid, randrow, randcol, J, H))
+            if r < threshold
+                flip!(spingrid, randrow, randcol)
+            end
+        end
+    end
+    spingrid
 end
