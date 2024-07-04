@@ -112,7 +112,15 @@ end
 # ALL WILL FAIL AS OF 24-06-24
 #
 @testset "Metropolis.jl" begin
-    spingrid = SpinGrid(
-        map(ISpin, [1 0 0 0 1; 1 0 0 0 1; 0 1 1 1 0; 1 0 1 0 1; 1 1 0 1 0]),
-    )
+    spingrid = SpinGrid(5, 5, 1.0)
+    nn = SpinLatticePhaseChanges.neighbourinteraction(spingrid, 1)
+    H = (15E-12, 0) # see local effects due to magnetism
+    mg = SpinLatticePhaseChanges.magneticinteraction(spingrid, H)
+
+    @test nn / (ħ^2 / 4) == -40
+    @test mg / (g * μ * ħ / 2) ≈ -3.75E-10
+
+    mg = SpinLatticePhaseChanges.magneticinteraction(spingrid, (15E-12, π/4))
+    @test mg / (g * μ * ħ / 2) ≈ -2.6516504294495536e-10
+
 end
