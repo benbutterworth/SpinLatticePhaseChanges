@@ -105,25 +105,47 @@ function ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0
     energyAfterFlip - energyBeforeFlip
 end
 
+function ΔE_efficient(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
+    # segment then calculate energy before & after flipping. INCLUDE H.
+    spingridSegment = segment(spingrid, x, y)
+    x2, y2 = segmentcenter(spingrid, x, y)
+    flippedGrid = flip(spingridSegment, x2, y2)
+    energyBeforeFlip = ising_energy(spingridSegment, J, H)
+    energyAfterFlip = ising_energy(flippedGrid, J, H)
+    energyAfterFlip - energyBeforeFlip
+end
+
 
 #======================= EXECUTE SPINFLIPPING ALGORITHM =======================#
 """
-    run_metropolis(spingrid::SpinGrid, temperature::Real nFlips::Int)
-Execute the metropolis spin-flipping algorithm `nFlips` times `spingrid`.
+    run_metropolis(spingrid::SpinGrid, params::Dict, nFlips::Int) -> SpinGrid
+Execute the metropolis spin-flipping algorithm `nFlips` times on `spingrid`.
+
+### Parameters
+params = Dict(
+    "temperature" -> ::Float64           # Temperature in Kelvin
+    "exchange" -> ::Float64              # Heisenberg interaction strength
+    "field" -> ::Tuple{Float64, Float64} # Applied magnetic field
+)
+'''
+
 """
-function run_metropolis(spingrid::SpinGrid, temperature::Real, nFlips::Int)
-    J = 7/2
-    H = (0,0)
+function run_metropolis(spingrid::SpinGrid, params::Dict, nFlips::Int)
+    temperature = params["temperature"]
+    J = params["exchange"]
+    H = params["field"]
     nrows, ncols = size(spingrid)
+
     let spingrid = spingrid # change local not global variable? #memory issues?
-        for i in 1:nFlips
+        for _ in 1:nFlips
             randrow = rand(1:nrows); randcol = rand(1:ncols)
             r = rand()
-            threshold = exp(-β(temperature) * ΔE(spingrid, randrow, randcol, J, H))
+            threshold = exp(-β(temperature) * ΔE(spingrid, randrow, randcol, J, H)) #calculate
             if r < threshold
                 flip!(spingrid, randrow, randcol)
             end
         end
     end
+
     spingrid
 end
