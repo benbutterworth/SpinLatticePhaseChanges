@@ -96,25 +96,19 @@ end
 
 """
     ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H=(0, 0))
-Return the change in energy of `spingrid` caused by flipping Spin _(x,y)_.
+Return the change in energy of `spingrid` caused by flipping Spin `(x,y)`.
 """
 function ΔE(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
-    # segment then calculate energy before & after flipping. INCLUDE H.
-    energyBeforeFlip = ising_energy(spingrid, J, H)
-    energyAfterFlip = ising_energy(flip(spingrid, x, y), J, H)
-    energyAfterFlip - energyBeforeFlip
-end
-
-function ΔE_efficient(spingrid::SpinGrid, x::Int, y::Int, J::Real, H::Tuple{Real,Real}=(0, 0))
-    # segment then calculate energy before & after flipping. INCLUDE H.
+    # slice the spingrid to investigate only the area affected by the flip 
     spingridSegment = segment(spingrid, x, y)
     x2, y2 = segmentcenter(spingrid, x, y)
     flippedGrid = flip(spingridSegment, x2, y2)
+    # calc change in energy
     energyBeforeFlip = ising_energy(spingridSegment, J, H)
     energyAfterFlip = ising_energy(flippedGrid, J, H)
+
     energyAfterFlip - energyBeforeFlip
 end
-
 
 #======================= EXECUTE SPINFLIPPING ALGORITHM =======================#
 """
@@ -122,13 +116,9 @@ end
 Execute the metropolis spin-flipping algorithm `nFlips` times on `spingrid`.
 
 ### Parameters
-params = Dict(
-    "temperature" -> ::Float64           # Temperature in Kelvin
-    "exchange" -> ::Float64              # Heisenberg interaction strength
-    "field" -> ::Tuple{Float64, Float64} # Applied magnetic field
-)
-'''
-
+- "temperature" -> ::Float64            `Temperature in Kelvin`
+- "exchange" -> ::Float64               `Heisenberg interaction strength`
+- "field" -> ::Tuple{Float64, Float64}  `Applied magnetic field`
 """
 function run_metropolis(spingrid::SpinGrid, params::Dict, nFlips::Int)
     temperature = params["temperature"]
