@@ -32,9 +32,10 @@ mutable struct SpinGrid <: SpinLattice
         if !is2D(spingrid)
             @error "spingrid is not 2D"
         end
-        if !atLeast5x5(spingrid)
-            @warn "spingrid is small - size < (5,5). Take care when using segment."
-        end
+        # WARNING needed for dev, but not during Metropolis Algo
+        # if !atLeast5x5(spingrid)
+        #     @warn "spingrid is small - size < (5,5). Take care when using segment."
+        # end
         new(spingrid)
     end
 
