@@ -44,13 +44,13 @@ end
     )
     s = SpinGrid(100, 100, 1.0)
 
-    @test size(spingrid) == (5,5)
-    @test map(spin, spins(spingrid)) == [-1 -1 -1 -1 -1; -1 -1 1 1 -1; 1 1 1 -1 -1; 1 -1 -1 -1 1; -1 1 -1 -1 1] 
+    @test size(spingrid) == (5, 5)
+    @test map(spin, spins(spingrid)) == [-1 -1 -1 -1 -1; -1 -1 1 1 -1; 1 1 1 -1 -1; 1 -1 -1 -1 1; -1 1 -1 -1 1]
 
     # test that flip changes energy correctly and updates properly.
-    spintest = spingrid[3,3]
+    spintest = spingrid[3, 3]
     flip!(spingrid, 3, 3)
-    @test spintest == flip(spingrid[3,3])
+    @test spintest == flip(spingrid[3, 3])
 
     @test sum(spin, spins(s)) == 100^2
 end
@@ -108,9 +108,6 @@ end
 end
 
 
-#
-# ALL WILL FAIL AS OF 24-06-24
-#
 @testset "Metropolis.jl" begin
     spingrid = SpinGrid(5, 5, 1.0)
     nn = SpinLatticePhaseChanges.neighbourinteraction(spingrid, 1)
@@ -120,7 +117,16 @@ end
     @test nn / (ħ^2 / 4) == -40
     @test mg / (g * μ * ħ / 2) ≈ -3.75E-10
 
-    mg = SpinLatticePhaseChanges.magneticinteraction(spingrid, (15E-12, π/4))
+    mg = SpinLatticePhaseChanges.magneticinteraction(spingrid, (15E-12, π / 4))
     @test mg / (g * μ * ħ / 2) ≈ -2.6516504294495536e-10
+
+    params = Dict(
+        "temperature" => 68,
+        "exchange" => 3.5,
+        "field" => (0.0, 0.0),
+        "flips" => 10_000
+    )
+
+    
 
 end
