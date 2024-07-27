@@ -48,12 +48,15 @@ Spin[↓ ↓ … ↓ ↓; ↓ ↓ … ↓ ↓; … ; ↓ ↓ … ↑ ↑; ↓ �
 
 ## Technical Information
 
-In this project I have used the following form of the Ising Hamiltonian, $\mathcal{H}_I$, where $S_i \in \{±\frac{\hbar}{2}\}$ is the spin of the electron at site $i$, $\mu_i$ it's magnetic moment, $J_{ij}$ the Heisenberg exchange energy between electrons $i$ and $j$, and $\bar H$ is the applied magnetic field.
+In this project I have used the following form of the Ising Hamiltonian, $\mathcal{H}\_I$, where $S_i \in \{±\frac{\hbar}{2}\}$ is the spin of the electron at site $i$, $\mu\_i$ it's magnetic moment, $J\_{ij}$ the Heisenberg exchange energy between electrons $i$ and $j$, and $\bar H$ is the applied magnetic field.
 
-$$\mathcal{H}_I = -\sum_{i,j} J_{ij} \ \bar S_i \cdot \bar S_j - \sum_{i} \bar \mu_i \cdot \bar H $$
+``math
+\mathcal{H}_I = -\sum_{i,j} J_{ij} \ \bar S_i \cdot \bar S_j - \sum_{i} \bar \mu_i \cdot \bar H 
+``
 
 There is no standard form of the Ising model in the literature. I regard this form as the clearest which retains the full generality of the system.
 
 ## Credit
 *Ben Butterworth 2024*
+
 This was a fun little project and I am happy with how it's finished. One day I'd like to come back to it and develop it further.
