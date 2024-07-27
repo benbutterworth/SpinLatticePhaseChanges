@@ -139,3 +139,32 @@ function run_metropolis(spingrid::SpinGrid, params::Dict, nFlips::Int)
 
     spingrid
 end
+
+"""
+    run_metropolis(spingrid:SpinGrid)
+Interactively run the metropolis spin-flipping algorithm on SpinGrid.
+"""
+function run_metropolis(spingrid::SpinGrid)
+
+    function getvariable(message, type)
+        print("\n", message)
+        input = readline()
+        output = parse(type, input)
+        output
+    end
+
+    temperature = getvariable("Temperature of the system (K) : ", Float64)
+    exchange = getvariable("Heisenberg exchange energy (eV) : ", Float64)
+    fieldStrength = getvariable("Applied magnetic field strength (T) : ", Float64)
+    fieldDirection = getvariable("Direction of applied field (rad) : ", Float64)
+    nflips = getvariable("Number of ising model flips (Int64) : ", Int64)
+
+    params = Dict(
+        "exchange" => exchange,
+        "temperature" => temperature,
+        "field" => (fieldStrength, fieldDirection) 
+    )
+
+    run_metropolis(spingrid, params, nflips)
+
+end
